@@ -3,12 +3,12 @@
 // Constructors and Destructors
 Game::Game(sf::RenderWindow &window) {
 	this->car = new Car(15.0f, 8.0f, 1500.0f);
-	this->ground = new Ground(WIDTH, 200.0f);
+	this->ground = new Ground(WIDTH, 20.0f);
 	this->cliff = new Ground(WIDTH*0.5, HEIGHT*0.5);
 
 	this->startX = 0.0f;
 	this->startY = HEIGHT*0.5 - this->car->getHeight();
-	this->gravity = 9.12f;
+	this->gravity = 9.82f;
 
 	this->car->changePos(startX, startY);
 	this->cliff->changePos(0.0f, HEIGHT*0.5);

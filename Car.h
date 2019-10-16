@@ -1,19 +1,20 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <iostream>
 
 class Car {
 private:
 	sf::RectangleShape body;
 	sf::Texture texture;
 
-	float speed;		//
+	float speedX;
+	float speedY;
 	float weight;		//kg
 
 	float width;
 	float height;
 
 	void movementInput(float deltaTime);
-	void move(sf::Vector2f& movement);
 public:
 	Car(float width, float height, float weight);
 	~Car();

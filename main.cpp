@@ -8,6 +8,7 @@ int main()
 	float deltaTime = 0.0f;																
 	sf::Clock clock;
 	Game game(window);
+	window.setVerticalSyncEnabled(true);
 	
 	while (window.isOpen())
 	{
