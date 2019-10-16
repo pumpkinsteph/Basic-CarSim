@@ -1,9 +1,9 @@
 #include "Car.h"
 
-Car::Car(float width, float height) {
+Car::Car(float width, float height, float weight) {
 	this->speed = 100;
-	this->weight = 100;
 
+	this->weight = weight;
 	this->width = width;
 	this->height = height;
 
@@ -41,8 +41,29 @@ float Car::getHeight() {
 	return this->height;
 }
 
-void Car::update(float deltaTime) {
+float Car::gravityForce(float deltaTime, float gravity, float slopeAngle) {
+	return this->weight*gravity*cos(slopeAngle)*deltaTime;
+}
+
+float Car::gravityRolling(float deltaTime, float gravity, float slopeAngle) {
+	return this->weight*gravity*sin(slopeAngle)*deltaTime;
+}
+
+void Car::update(float deltaTime, float cliffWidth, float groundHeight, float gravity) {
 	movementInput(deltaTime);
+	sf::Vector2f currentPos = this->body.getPosition();
+	sf::Vector2f movement(0.0f, 0.0f);
+
+	if (currentPos.x > cliffWidth && currentPos.y < groundHeight) {
+		movement.y += gravity * deltaTime;
+		this->move(movement);
+	}
+	/*
+	if car.x > cliffWidth
+		apply gravity on movement
+	if car.y > groundHeight - carHeight
+		stop gravity on movement
+	*/
 }
 
 void Car::draw(sf::RenderWindow* window) {
