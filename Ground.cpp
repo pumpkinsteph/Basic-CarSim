@@ -1,10 +1,12 @@
 #include "Ground.h"
 
-Ground::Ground(float width, float height) {
+Ground::Ground(string fileName, float width, float height) {
+
+	this->texture.loadFromFile(fileName);
+	this->body.setTexture(this->texture);
+
 	this->width = width;
 	this->height = height;
-	this->body.setSize(sf::Vector2f(width, height));
-	body.setFillColor(sf::Color::Red);
 }
 
 Ground::~Ground() {

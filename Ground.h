@@ -1,15 +1,18 @@
 #pragma once
 #include <SFML\Graphics.hpp>
+#include <string>
+
+using namespace std;
 
 class Ground {
 private:
-	sf::RectangleShape body;
+	sf::Sprite body;
 	sf::Texture texture;
 
 	float width;
 	float height;
 public:
-	Ground(float width, float height);
+	Ground(string fileName, float width, float height);
 	~Ground();
 
 	void changePos(float x, float y);

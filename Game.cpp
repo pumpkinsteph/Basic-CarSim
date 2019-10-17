@@ -1,10 +1,9 @@
 #include "Game.h"
 
-// Constructors and Destructors
 Game::Game(sf::RenderWindow &window) {
-	this->car = new Car(15.0f, 8.0f, 1500.0f);
-	this->ground = new Ground(WIDTH, 20.0f);
-	this->cliff = new Ground(WIDTH*0.5, HEIGHT*0.5);
+	this->car = new Car("car.png",15.0f, 8.0f, 1500.0f);
+	this->ground = new Ground("ground.png",WIDTH, 20.0f);
+	this->cliff = new Ground("cliff.png",WIDTH*0.5, HEIGHT*0.5);
 
 	this->startX = 0.0f;
 	this->startY = HEIGHT*0.5 - this->car->getHeight();
@@ -19,8 +18,8 @@ Game::Game(sf::RenderWindow &window) {
 
 Game::~Game() {
 	delete this->car;
-	delete this->cliff;
 	delete this->ground;
+	delete this->cliff;
 }
 
 void Game::update(float deltaTime) {
