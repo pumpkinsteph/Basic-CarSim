@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML\Graphics.hpp>
 #include <string>
-#include <iostream>
+#include "Drivetrain.h"
 
 using namespace std;
 
@@ -10,14 +10,24 @@ private:
 	sf::Texture texture;
 	sf::Sprite body;
 
+	sf::RectangleShape rpmMeter;
+	sf::RectangleShape throttleMeter;
+	sf::RectangleShape throttleBack;
+
+	sf::Font font;
+	sf::Text speedometer;
+	sf::Text rpmText;
+
+	Drivetrain engine;
+
 	float speedX;
 	float speedY;
-	float weight;
-
+	float mass;
 	float width;
 	float height;
-
-	void movementInput(float deltaTime);
+	float frictionForce;
+	float acceleration;
+	float forceX;
 public:
 	Car(string fileName, float width, float height, float weight);
 	~Car();
