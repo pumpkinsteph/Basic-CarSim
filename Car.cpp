@@ -66,6 +66,15 @@ float Car::gravityRolling(float deltaTime, float gravity, float slopeAngle) {
 	return this->mass*gravity*sin(slopeAngle)*deltaTime;
 }
 
+void Car::reset(float x, float y) {
+	this->changePos(x, y);
+	this->speedX = 0.0f;
+	this->speedY = 0.0f;
+	this->frictionForce = 0.0f;
+	this->acceleration = 0.0f;
+	this->forceX = 0.0f;
+}
+
 void Car::update(float deltaTime, float cliffWidth, float groundHeight, float gravity) {	
 	sf::Vector2f currentPos = this->body.getPosition();
 
@@ -76,8 +85,15 @@ void Car::update(float deltaTime, float cliffWidth, float groundHeight, float gr
 	}
 	else {
 		this->forceX = this->engine.getForce() - this->frictionForce;
-		this->engine.setRPM(this->speedX);	
+		this->engine.setRPM(this->speedX);
 	}
+
+	/*
+	Det finns 3 fall:
+	- på klippan när den är 0 <= x <= cliffWidth och y = 300 - carheight()
+	- när den faller från klippan x > cliffWidth och 300 - carheight() <= y < groundHeight
+	- när den träffar marken x > cliffWidth och y = groundHeight
+	*/
 
 	this->acceleration = this->forceX / this->mass;		//a = F / m
 	this->speedX += acceleration * deltaTime;			//v = v0 + at

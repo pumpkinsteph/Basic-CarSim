@@ -24,6 +24,10 @@ Game::~Game() {
 
 void Game::update(float deltaTime) {
 	car->update(deltaTime, this->cliff->getWidth(), HEIGHT - this->ground->getHeight() - this->car->getHeight(), this->gravity);
+	//restart game if R is pressed
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+		this->restartGame();
+	}
 }
 
 void Game::draw() {
@@ -36,6 +40,6 @@ void Game::gameOver(float deltaTime) {
 
 }
 
-void Game::restetGame() {
-
+void Game::restartGame() {
+	this->car->reset(this->startX, this->startY);
 }

@@ -38,6 +38,7 @@ public:
 
 	//float gravityForce(float deltaTime, float gravity, float slopeAngle);
 	float gravityRolling(float deltaTime, float gravity, float slopeAngle);
+	void reset(float x, float y);
 	void update(float deltaTime, float cliffWidth, float groundHeight, float gravity);
 	void draw(sf::RenderWindow* window);
 };

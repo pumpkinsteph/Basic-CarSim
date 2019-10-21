@@ -17,7 +17,7 @@ private:
 	float gravity;
 
 	void gameOver(float deltaTime);
-	void restetGame();
+	void restartGame();
 
 public:
 	Game(sf::RenderWindow &window);
