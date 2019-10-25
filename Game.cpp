@@ -1,29 +1,27 @@
 #include "Game.h"
 
-Game::Game(sf::RenderWindow &window) {
-	this->car = new Car("car.png",15.0f, 8.0f, 1393.0f);
-	this->ground = new Ground("ground.png",WIDTH, 20.0f);
-	this->cliff = new Ground("cliff.png",WIDTH*0.5, HEIGHT*0.5);
-
+Game::Game(sf::RenderWindow &window) 
+	:car("car.png", 4.3f, 1.2f, 15.0f, 8.0f, 1393.0f), ground("ground.png", WIDTH, 20.0f), cliff("cliff.png", WIDTH * 0.5, HEIGHT * 0.5) {
 	this->startX = 0.0f;
-	this->startY = HEIGHT*0.5f - this->car->getHeight();
+	this->startY = HEIGHT - this->cliff.getHeight() - this->car.getSpriteHeight();
 	this->gravity = 9.82f;
 
-	this->car->changePos(startX, startY);
-	this->cliff->changePos(0.0f, HEIGHT*0.5f);
-	this->ground->changePos(0.0f, HEIGHT - this->ground->getHeight());
+	this->car.changePos(startX, startY);
+	this->cliff.changePos(0.0f, HEIGHT - this->cliff.getHeight());
+	this->ground.changePos(0.0f, HEIGHT - this->ground.getHeight());
 
 	this->window = &window;
 }
 
 Game::~Game() {
-	delete this->car;
-	delete this->ground;
-	delete this->cliff;
+
 }
 
+
+
 void Game::update(float deltaTime) {
-	car->update(deltaTime, this->cliff->getWidth(), HEIGHT - this->ground->getHeight() - this->car->getHeight(), this->gravity);
+	this->car.update(deltaTime, this->cliff.getWidth(), HEIGHT - this->ground.getHeight() - this->car.getSpriteHeight(), this->gravity);
+
 	//restart game if R is pressed
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
 		this->restartGame();
@@ -31,15 +29,11 @@ void Game::update(float deltaTime) {
 }
 
 void Game::draw() {
-	ground->draw(window);
-	cliff->draw(window);
-	car->draw(window);
-}
-
-void Game::gameOver(float deltaTime) {
-
+	this->ground.draw(this->window);
+	this->cliff.draw(this->window);
+	this->car.draw(this->window);
 }
 
 void Game::restartGame() {
-	this->car->reset(this->startX, this->startY);
+	this->car.reset(this->startX, this->startY);
 }

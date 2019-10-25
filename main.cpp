@@ -10,13 +10,11 @@ int main()
 	Game game(window);
 	window.setVerticalSyncEnabled(true);
 	
-	while (window.isOpen())
-	{
+	while (window.isOpen()) {
 		deltaTime = clock.restart().asSeconds();
 		
 		sf::Event evnt;
-		while (window.pollEvent(evnt))
-		{
+		while (window.pollEvent(evnt)) {
 			if (evnt.type == sf::Event::Closed)
 				window.close();
 		}

@@ -98,10 +98,13 @@ float Drivetrain::getThrottle() {
 	return this->throttle;
 }
 
+void Drivetrain::setGear(int gear) {
+	this->currentGear = gear - 1;
+}
+
 void Drivetrain::printValues(float speed)
 {
-	if (this->printDelay == 20)
-	{
+	if (this->printDelay == 20)	{
 		std::cout << "Gear: " << this->currentGear + 1 << " RPM: " << this->rpm << " Throttle: " << this->throttle 
 			<< "\nTorque: " << this->getTorque() << " Force: " << this->getForce() << " Speed: " << speed << "\n\n";
 		this->printDelay = 0;

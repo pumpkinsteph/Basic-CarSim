@@ -1,17 +1,38 @@
 #include "Car.h"
 
-Car::Car(string fileName, float width, float height, float weight) {
+void Car::updateUI() {
+	int rpmColour = (int)((float)engine.getRPM() * (255.0f / 7500.0f));
+	this->rpmMeter.setFillColor(sf::Color(rpmColour, 255 - rpmColour, 0));
+	this->rpmMeter.setSize(sf::Vector2f(this->engine.getRPM() * 500.0f / 7500.0f, 30.0f));
+
+	this->throttleMeter.setSize(sf::Vector2f(this->engine.getThrottle() * 100.0f, 20.0f));
+
+	std::string speed = "Speed:   " + std::to_string((int)(this->velocity.x * 3.6f)) + " km/h";
+	this->speedometer.setString(speed);
+	std::string revs = "Gear: " + std::to_string(this->engine.getGear()) + "       RPM: " + std::to_string(this->engine.getRPM());
+	this->rpmText.setString(revs);
+
+	//this->engine.printValues(this->velocity.x);
+}
+
+Car::Car(string fileName, float carWidth, float carHeight, float spriteWidth, float spriteHeight, float weight) {
 	this->texture.loadFromFile(fileName);
 	this->body.setTexture(this->texture);
 
-	this->speedX = 0.0f;
-	this->speedY = 0.0f;
+	this->velocity = sf::Vector2f(0.0f, 0.0f);
+	this->acceleration = sf::Vector2f(0.0f, 0.0f);
+	this->force = sf::Vector2f(0.0f, 0.0f);
 	this->frictionForce = 0.0f;
-	this->acceleration = 0.0f;
-	this->forceX = 0.0f;
+	this->dragArea = 2.17f;
+	this->Cdx = 0.35f;
+	this->Cdy = 1.28f;
 	this->mass = weight;
-	this->width = width;
-	this->height = height;
+	this->carWidth = carWidth;
+	this->carHeight = carHeight;
+	this->spriteHeight = spriteHeight;
+	this->spriteWidth = spriteWidth;
+	this->carDepth = 1.8f;
+	this->distanceTravel = 0.0f;
 
 	this->rpmMeter.setPosition(400.0f, 25.0f);
 	this->rpmMeter.setSize(sf::Vector2f(100.0f, 30.0f));
@@ -20,10 +41,6 @@ Car::Car(string fileName, float width, float height, float weight) {
 	this->throttleMeter.setPosition(50.0f, 25.0f);
 	this->throttleMeter.setSize(sf::Vector2f(20.0f, 5.0f));
 	this->throttleMeter.setFillColor(sf::Color::White);
-
-	this->throttleBack.setPosition(50.0f, 25.0f);
-	this->throttleBack.setSize(sf::Vector2f(100.0f, 20.0f));
-	this->throttleBack.setFillColor(sf::Color::White);
 
 	this->font.loadFromFile("sansation.ttf");
 	this->speedometer.setString("SPEED...");
@@ -37,67 +54,85 @@ Car::Car(string fileName, float width, float height, float weight) {
 	this->rpmText.setPosition(500.0f, 60.0f);
 	this->rpmText.setCharacterSize(24);
 	this->rpmText.setColor(sf::Color::White);
+
+	this->distanceText.setString("");
+	this->distanceText.setFont(font);
+	this->distanceText.setPosition(500, 250);
+	this->distanceText.setCharacterSize(36);
+	this->distanceText.setColor(sf::Color::White);
 }
 
 Car::~Car() {
 
 }
 
-void Car::changePos(float x, float y) {
-	this->body.setPosition(x, y);
+float Car::getCarWidth() {
+	return this->carWidth;
 }
 
-float Car::getWidth() {
-	return this->width;
+float Car::getCarHeight() {
+	return this->carHeight;
 }
 
-float Car::getHeight() {
-	return this->height;
+float Car::getSpriteWidth()
+{
+	return this->spriteWidth;
 }
 
-/*//the force that pushes the car down
-float Car::gravityForce(float deltaTime, float gravity, float slopeAngle) {
-	return this->weight*gravity*cos(slopeAngle)*deltaTime;
-}
-*/
-
-////the force that makes the car roll backwards or forwards on a ramp
-float Car::gravityRolling(float deltaTime, float gravity, float slopeAngle) {
-	return this->mass*gravity*sin(slopeAngle)*deltaTime;
+float Car::getSpriteHeight()
+{
+	return this->spriteHeight;
 }
 
 void Car::reset(float x, float y) {
-	this->changePos(x, y);
-	this->speedX = 0.0f;
-	this->speedY = 0.0f;
+	this->body.setPosition(x, y);
+	this->velocity = sf::Vector2f(0.0f, 0.0f);
+	this->acceleration = sf::Vector2f(0.0f, 0.0f);
+	this->force = sf::Vector2f(0.0f, 0.0f);
 	this->frictionForce = 0.0f;
-	this->acceleration = 0.0f;
-	this->forceX = 0.0f;
+	this->distanceTravel = 0.0f;
+	this->distanceText.setString("");
+	this->engine.setGear(1);
+}
+
+void Car::changePos(float x, float y)
+{
+	this->body.setPosition(x, y);
 }
 
 void Car::update(float deltaTime, float cliffWidth, float groundHeight, float gravity) {	
 	sf::Vector2f currentPos = this->body.getPosition();
 
-	if (currentPos.x > cliffWidth && currentPos.y < groundHeight) {
-		this->speedY += gravity * deltaTime;
-		body.move(0.0f, this->speedY * deltaTime);
-		this->forceX = 0.0f;							//Change this when adding air resistance
+	if (currentPos.x > cliffWidth && currentPos.y < groundHeight)
+	{
+		//Height: 1.2, Depth: 1.8, Length: 4.8
+		this->force.x = Fdx(this->velocity, this->dragArea, Cdx);
+		this->force.y = Fdy(this->velocity, calculateArea(this->carWidth, this->carDepth), this->Cdy) + (gravity * this->mass);
+		this->distanceTravel += this->velocity.x * deltaTime;
+
+		std::string distance = std::to_string((int)(this->distanceTravel)) + "m";
+		this->distanceText.setString(distance);
 	}
-	else {
-		this->forceX = this->engine.getForce() - this->frictionForce;
-		this->engine.setRPM(this->speedX);
+	else
+	{
+		if (currentPos.x > cliffWidth) {
+			this->velocity = sf::Vector2f(0.0f, 0.0f);
+			this->acceleration = sf::Vector2f(0.0f, 0.0f);
+			this->force = sf::Vector2f(0.0f, 0.0f);
+			this->frictionForce = 0.0f;
+		}
+		else {
+			this->velocity.y = 0.0f;
+			this->force.x = this->engine.getForce() - this->frictionForce + Fdx(this->velocity, this->dragArea, this->Cdx);
+		}
+
 	}
 
-	/*
-	Det finns 3 fall:
-	- på klippan när den är 0 <= x <= cliffWidth och y = 300 - carheight()
-	- när den faller från klippan x > cliffWidth och 300 - carheight() <= y < groundHeight
-	- när den träffar marken x > cliffWidth och y = groundHeight
-	*/
+	this->engine.setRPM(this->velocity.x);
 
-	this->acceleration = this->forceX / this->mass;		//a = F / m
-	this->speedX += acceleration * deltaTime;			//v = v0 + at
-	this->body.move(this->speedX * deltaTime, 0.0f);
+	this->acceleration = this->force / this->mass;				//a = F / m
+	this->velocity += this->acceleration * deltaTime;			//v = v0 + at
+	this->body.move(this->velocity * deltaTime);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		this->engine.shiftUp();
@@ -109,38 +144,20 @@ void Car::update(float deltaTime, float cliffWidth, float groundHeight, float gr
 	else
 		this->engine.decelerate();	//Automatic engine braking
 
-	//Change make sure the friction force has the correct direction and rests at 0
-	if (this->speedX > 0.0f)
+	//Make sure the friction force has the correct direction and rests at 0
+	if (this->velocity.x > 0.0f)
 		this->frictionForce = 0.015f * gravity * this->mass;	//0.015 = rolling friction coefficient
-	else if (this->speedX < 0.0f)
+	else if (this->velocity.x < 0.0f)
 		this->frictionForce = -0.015f * gravity * this->mass;
 
-
-	/* ------------------- UI stuff ---------------------- */
-	int rpmColour = (int)((float)engine.getRPM() * (255.0f / 7500.0f));
-	this->rpmMeter.setFillColor(sf::Color(rpmColour, 255 - rpmColour, 0));
-	this->rpmMeter.setSize(sf::Vector2f(this->engine.getRPM() * 500.0f / 7500.0f, 30.0f));
-
-	this->throttleMeter.setSize(sf::Vector2f(this->engine.getThrottle() * 100.0f, 20.0f));
-
-	std::string speed = "Speed:   " + std::to_string((int)(this->speedX * 3.6f)) + " km/h";
-	this->speedometer.setString(speed);
-	std::string revs = "Gear: " + std::to_string(this->engine.getGear()) + "       RPM: " + std::to_string(this->engine.getRPM());
-	this->rpmText.setString(revs);
-
-	this->engine.printValues(this->speedX);
-
-	/*
-	if on a slope
-		apply gravity Rolling
-	*/
+	this->updateUI();
 }
 
 void Car::draw(sf::RenderWindow* window) {
 	window->draw(this->body);
 	window->draw(this->rpmMeter);
-	//window->draw(this->throttleBack);
 	window->draw(this->throttleMeter);
 	window->draw(this->speedometer);
 	window->draw(this->rpmText);
+	window->draw(this->distanceText);
 }

@@ -31,6 +31,7 @@ public:
 	int getGear();
 	float getForce();
 	float getThrottle();
+	void setGear(int gear);
 
 	void printValues(float speed);
 };

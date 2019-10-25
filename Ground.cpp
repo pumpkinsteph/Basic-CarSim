@@ -1,7 +1,6 @@
 #include "Ground.h"
 
 Ground::Ground(string fileName, float width, float height) {
-
 	this->texture.loadFromFile(fileName);
 	this->body.setTexture(this->texture);
 
@@ -14,8 +13,7 @@ Ground::~Ground() {
 }
 
 void Ground::changePos(float x, float y) {
-	body.setPosition(x, y);
-
+	this->body.setPosition(x, y);
 }
 
 float Ground::getWidth() {
@@ -31,5 +29,5 @@ void Ground::update(float deltaTime) {
 }
 
 void Ground::draw(sf::RenderWindow* window) {
-	window->draw(body);
+	window->draw(this->body);
 }
