@@ -23,8 +23,8 @@ Car::Car(string fileName, float carWidth, float carHeight, float spriteWidth, fl
 	this->acceleration = sf::Vector2f(0.0f, 0.0f);
 	this->force = sf::Vector2f(0.0f, 0.0f);
 	this->frictionForce = 0.0f;
-	this->dragArea = 2.17f;
-	this->Cdx = 0.35f;
+	this->dragArea = 1.94f;
+	this->Cdx = 0.31f;
 	this->Cdy = 1.28f;
 	this->mass = weight;
 	this->carWidth = carWidth;
